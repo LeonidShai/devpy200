@@ -1,5 +1,5 @@
 # реализация циклического двусвязного списка
-
+from weakref import ref
 
 class DLL:
     class Node:
@@ -57,7 +57,7 @@ class DLL:
         """
         return self.__lenght
 
-    def __ssilki(self):
+    def ssilki(self):
         """
         Метод для проверки ссылок, печает адрес каждого узла,
         и адреса, на которые можно перейти с данного узла.
@@ -256,21 +256,22 @@ class DLL:
 
 if __name__ == "__main__":
     dlist = DLL()
-    dlist.add_node("abrac")
-    dlist.add_node("ajb")
-    dlist.add_node("kuraga")
-    dlist.add_node("gorb")
-    dlist.add_node("fart")
-    dlist.add_node("brok")
+    dlist.add_node(2)
+    dlist.add_node(7)
+    dlist.add_node(9)
+    dlist.add_node(1)
+    dlist.add_node(4)
+    dlist.add_node(8)
     print(dlist, dlist.str_lenght)
-    print(dlist.search_node("kuraga"))
-    dlist.left_add_node("bool")
-    dlist.left_add_node("step")
+    print(dlist.search_node(4))
+    dlist.left_add_node(3)
+    dlist.left_add_node(6)
     print(dlist, dlist.str_lenght)
     print(dlist.str_back())
-    dlist.remove_node(5)
+    dlist.remove_node(7)
     print(dlist, dlist.str_lenght)
-    dlist.delete_node("beda")
+    dlist.delete_node(9)
     print(dlist, dlist.str_lenght)
-    dlist.insert_node("hru", 4)
+    dlist.insert_node(3, 4)
     print(dlist, dlist.str_lenght)
+    dlist.ssilki()
