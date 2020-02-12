@@ -65,17 +65,17 @@ class Date:
     def year(self):
         return self.__year
 
-    def add_day(self, day):
+    def add_day(self, day):  #TODO
         pass
 
-    def add_month(self, month):
+    def add_month(self, month):  #TODO
         pass
 
-    def add_year(self, year):
+    def add_year(self, year):  #TODO
         pass
 
     @staticmethod
-    def date2_date1(date2, date1):
+    def date2_date1(date2, date1):  #TODO
         pass
 
     def __lt__(self, other):
