@@ -1,5 +1,5 @@
-# реализация циклического двусвязного списка
-
+# реализация циклического двусвязного списка с использование слабых ссылок
+import weakref
 
 class DLL:
     class Node:
@@ -21,7 +21,7 @@ class DLL:
             elif sled is not None and not isinstance(pred, type(self)):
                 raise TypeError
             else:
-                self.pred = pred
+                self.pred = weakref.ref(pred) if pred is not None else None
                 self.data = data
                 self.sled = sled
 
@@ -46,7 +46,7 @@ class DLL:
             spisok += f"{usel.data}, "
             usel = usel.sled
             i += 1
-        spisok = "[" + spisok[:-2] + "]"
+        spisok = "Список:\t\t\t [" + spisok[:-2] + "]"
         return spisok
 
     @property
@@ -55,9 +55,9 @@ class DLL:
         Метод, позволяющий посмотреть длину списка
         :return: int
         """
-        return self.__lenght
+        return f"{self.__lenght} элементов"
 
-    def __ssilki(self):
+    def ssilki(self):
         """
         Метод для проверки ссылок, печает адрес каждого узла,
         и адреса, на которые можно перейти с данного узла.
@@ -66,7 +66,7 @@ class DLL:
         usel = self.head
         i = 0
         while i < self.__lenght:
-            print(usel.data, hex(id(usel)), hex(id(usel.pred)), hex(id(usel.sled)))
+            print(usel.data, hex(id(usel)), usel.pred, hex(id(usel.sled)))
             usel = usel.sled
             i += 1
 
@@ -76,12 +76,12 @@ class DLL:
         с конца self.tail к началу self.head
         :return: str
         """
-        usel = self.tail
-        spisok = "["
+        usel = self.head.pred
+        spisok = "Обратный список: ["
         i = 0
         while i < self.__lenght:
-            spisok += f"{usel.data}, "
-            usel = usel.pred
+            spisok += f"{usel().data}, "
+            usel = usel().pred
             i += 1
         spisok = spisok[:-2] + "]"
         return spisok
@@ -95,13 +95,14 @@ class DLL:
         if not self.head:
             self.head = self.Node(node, None, None)
         elif not self.tail:
-            self.tail = self.Node(node, self.head, None)
+            self.tail = self.Node(node, self.head, self.head)
             self.head.sled = self.tail
+            self.head.pred = weakref.ref(self.tail)
         else:
             current_node = self.tail
             self.tail = self.Node(node, current_node, self.head)
             current_node.sled = self.tail
-            self.head.pred = self.tail
+            self.head.pred = weakref.ref(self.tail)
         self.__lenght += 1
 
     def remove_node(self, indx):
@@ -112,24 +113,25 @@ class DLL:
         if not isinstance(indx, int):
             raise TypeError
 
+        print(f"Удаляю элемент с индексом {indx} из списка")
         if indx == 0:
             if self.__lenght > 1:
                 current_node = self.head
                 self.head = current_node.sled
                 current_node.sled = None
                 current_node.pred = None
-                self.head.pred = self.tail
+                self.head.pred = weakref.ref(self.tail)
                 self.tail.sled = self.head
             else:
                 self.clear()
 
         elif indx == self.__lenght-1:
             current_node = self.tail
-            self.tail = current_node.pred
+            self.tail = current_node.pred()
             current_node.pred = None
             current_node.sled = None
             self.tail.sled = self.head
-            self.head.pred = self.tail
+            self.head.pred = weakref.ref(self.tail)
 
         elif 1 <= indx <= self.__lenght-1:
             current_node = self.head.sled
@@ -139,14 +141,14 @@ class DLL:
             while sch < self.__lenght-1:
                 if sch == indx:
                     pred_node.sled = sled_node
-                    sled_node.pred = pred_node
+                    sled_node.pred = weakref.ref(pred_node)
                     current_node.pred = None
                     current_node.sled = None
                     current_node = sled_node
                 else:
                     current_node = current_node.sled
-                    pred_node = current_node.pred
-                    sled_node = current_node.sled
+                    pred_node = pred_node.sled
+                    sled_node = sled_node.sled
                 sch += 1
         else:
             print("Нет такого индекса")
@@ -160,6 +162,7 @@ class DLL:
         если значение повторяется несколько раз, то и удалится оно несколько раз.
         :param node: int, str
         """
+        print(f"Удаление узла со значением {node} из списка")
         index = self.search_node(node)
         if isinstance(index, list):
             self.remove_node(index[0])
@@ -184,6 +187,8 @@ class DLL:
         if not isinstance(node, (int, str)):
             raise TypeError
 
+        print(f"Вставка элемента {node} с индексом {indx}.")
+        print("Индексация начинается с нуля!")
         if indx == 0:
             print("1")
             self.left_add_node(node)
@@ -200,7 +205,7 @@ class DLL:
                     sled_node.pred = None
                     new_node = self.Node(node, current_node, sled_node)
                     current_node.sled = new_node
-                    sled_node.pred = new_node
+                    sled_node.pred = weakref.ref(new_node)
 
                 current_node = current_node.sled
                 sled_node = current_node.sled
@@ -214,7 +219,7 @@ class DLL:
         """
         head = self.head
         self.head = self.Node(node, self.tail, head)
-        head.pred = self.head
+        head.pred = weakref.ref(self.head)
         self.tail.sled = self.head
         self.__lenght += 1
 
@@ -229,6 +234,7 @@ class DLL:
         if not isinstance(node, (int, str)):
             raise TypeError
 
+        print(f"Провожу поиск узла {node} в списке")
         current_node = self.head
         spisok_index = []
         index = 0
@@ -256,21 +262,22 @@ class DLL:
 
 if __name__ == "__main__":
     dlist = DLL()
-    dlist.add_node("abrac")
-    dlist.add_node("ajb")
-    dlist.add_node("kuraga")
-    dlist.add_node("gorb")
-    dlist.add_node("fart")
-    dlist.add_node("brok")
+    dlist.add_node(2)
+    dlist.add_node(5)
+    dlist.add_node(3)
+    dlist.add_node(1)
+    dlist.add_node(4)
+    dlist.add_node(8)
     print(dlist, dlist.str_lenght)
-    print(dlist.search_node("kuraga"))
-    dlist.left_add_node("bool")
-    dlist.left_add_node("step")
+    print(dlist.search_node(9))
+    dlist.left_add_node(3)
+    dlist.left_add_node(1)
     print(dlist, dlist.str_lenght)
     print(dlist.str_back())
     dlist.remove_node(5)
     print(dlist, dlist.str_lenght)
-    dlist.delete_node("beda")
+    dlist.delete_node(1)
     print(dlist, dlist.str_lenght)
-    dlist.insert_node("hru", 4)
+    dlist.insert_node(3, 4)
     print(dlist, dlist.str_lenght)
+    dlist.ssilki()
