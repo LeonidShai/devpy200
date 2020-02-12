@@ -19,7 +19,7 @@ class Date:
         return self.year * 365 + (self.month - 1) * 30 + self.day
 
     @staticmethod
-    def is_leap_year(year):
+    def is_leap_year(year):  # TODO
         return False  #
 
     @classmethod
@@ -48,7 +48,10 @@ class Date:
 
     @date.setter
     def date(self, value):
-        pass
+        value = value.split(".")
+        self.__day = int(value[0])
+        self.__month = int(value[1])
+        self.__year = int(value[2])
 
     @property
     def day(self):
@@ -104,10 +107,12 @@ class Date:
             self.__day += other
 
 if __name__ == "__main__":
-    # data = Date(2019, 9, 19)
-    # print(data)
-    ld = Date(2019, 4, 6)
-    print(ld.get_max_day(2019, 4))
+    data = Date(2019, 9, 19)
+    print(data)
+    data.date = '23.2.2020'
+    print(data)
+    # ld = Date(2019, 4, 6)
+    # print(ld.get_max_day(2019, 4))
     # d1 = Date(2020, 2, 7)
     # d2 = Date(2020, 2, 6)
     # print(d1.kolvo_dnei - d2.kolvo_dnei)
