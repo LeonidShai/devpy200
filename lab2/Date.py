@@ -83,6 +83,7 @@ class Date:
 
     @date.setter
     def date(self, value):
+        print("Хочу, чтобы была дата:")
         value = value.split(".")
         self.__day = int(value[0])
         self.__month = int(value[1])
@@ -121,11 +122,11 @@ class Date:
 
     def add_month(self, month):
         month = self.__valid_type_value(month)
-        return f"{self.day}.{self.month + (month%12)}.{self.year + (month//12)}"
+        return f"Через {month} месяцев будет {self.day}.{self.month + (month%12)}.{self.year + (month//12)}"
 
     def add_year(self, year):
         year = self.__valid_type_value(year)
-        return f"{self.day}.{self.month}.{self.year + year}"
+        return f"Через {year} лет будет {self.day}.{self.month}.{self.year + year}"
 
     @staticmethod
     def date2_date1(date2, date1):  #TODO
