@@ -183,6 +183,9 @@ class Date:
                 gde = 1
             m -= 1
             d = Date.DAY_OF_MONTH[gde][m - 1] + d
+        if m < 0:
+            y -= 1
+            m = 12 + m
 
         return f"От {d2}.{m2}.{y2} до {d1}.{m1}.{y1} {d} дней, {m} месяцев, {y} лет."
 
