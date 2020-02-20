@@ -53,6 +53,11 @@ class Date:
 
     @classmethod
     def __valid_type_value(cls, value):
+        """
+        Проверка вводимого значения, перевод в int
+        :param value: int, str
+        :return: int
+        """
         if not isinstance(value, (int, str)):
             raise TypeError
         if isinstance(value, str):
@@ -64,6 +69,13 @@ class Date:
 
     @classmethod
     def __is_valid_date(cls, year, month, day):
+        """
+        Проверки вводимых значений
+        :param year: int
+        :param month: int
+        :param day: int
+        :return: None
+        """
         if not isinstance(year, int):
             raise TypeError('year must be int')
         if not isinstance(month, int):
@@ -102,6 +114,11 @@ class Date:
         return self.__year
 
     def add_day(self, day):
+        """
+        Добавляет количество дней к дате
+        :param day: int, str
+        :return: str
+        """
         day = self.__valid_type_value(day)  # провурка верности ввода
         d = day
 
@@ -150,16 +167,31 @@ class Date:
         return f"Через {d} дней будет {den}.{month}.{year}"
 
     def add_month(self, month):
+        """
+        Добавляет месяц к дате
+        :param month: int, str
+        :return: str
+        """
         month = self.__valid_type_value(month)
         return f"Через {month} месяцев будет {self.day}.{self.month + (month%12)}.{self.year + (month//12)}"
 
     def add_year(self, year):
+        """
+        Добавляет год к дате
+        :param year: int, str
+        :return: str
+        """
         year = self.__valid_type_value(year)
         return f"Через {year} лет будет {self.day}.{self.month}.{self.year + year}"
 
     @staticmethod
     def date2_date1(date1, date2):
-
+        """
+        Определяет промежуток времени от одной даты до другой в днях, месяцах и годах
+        :param date1: str
+        :param date2: str
+        :return: str
+        """
         date1 = date1.split(".")
         date2 = date2.split(".")
         d1, d2 = int(date1[0]), int(date2[0])
