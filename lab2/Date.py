@@ -103,6 +103,7 @@ class Date:
 
     def add_day(self, day):
         day = self.__valid_type_value(day)  # провурка верности ввода
+        d = day
 
         month = self.__month
         year = self.__year
@@ -146,7 +147,7 @@ class Date:
             year += 1
             month -= 12
 
-        return f"{den}.{month}.{year}"
+        return f"Через {d} дней будет {den}.{month}.{year}"
 
     def add_month(self, month):
         month = self.__valid_type_value(month)
@@ -170,6 +171,6 @@ if __name__ == "__main__":
     print(data.get_max_day(2019, 2))
     print(data.add_year(15))
     print(data.add_month(13))
-    print(data.add_day(381))
+    print(data.add_day(1365))
     # ld = Date(2019, 4, 6)
     # print(ld.get_max_day(2019, 4))
