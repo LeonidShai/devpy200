@@ -158,8 +158,33 @@ class Date:
         return f"Через {year} лет будет {self.day}.{self.month}.{self.year + year}"
 
     @staticmethod
-    def date2_date1(date2, date1):  #TODO
-        pass
+    def date2_date1(date1, date2):
+
+        date1 = date1.split(".")
+        date2 = date2.split(".")
+        d1, d2 = int(date1[0]), int(date2[0])
+        m1, m2 = int(date1[1]), int(date2[1])
+        y1, y2 = int(date1[2]), int(date2[2])
+        if y2 < y1:
+            y2, y1 = y1, y2
+            m2, m1 = m1, m2
+            d2, d1 = d1, d2
+
+        y = y2 - y1
+        m = m2 - m1
+        if m < 0:
+            y -= 1
+            m = 12 + m
+
+        d = d2 - d1
+        if d < 0:
+            gde = 0
+            if Date.is_leap_year(y):
+                gde = 1
+            m -= 1
+            d = Date.DAY_OF_MONTH[gde][m - 1] + d
+
+        return f"От {d2}.{m2}.{y2} до {d1}.{m1}.{y1} {d} дней, {m} месяцев, {y} лет."
 
 
 if __name__ == "__main__":
@@ -172,5 +197,6 @@ if __name__ == "__main__":
     print(data.add_year(15))
     print(data.add_month(13))
     print(data.add_day(1365))
+    print(data.date2_date1("12.3.2020", "9.4.2021"))
     # ld = Date(2019, 4, 6)
     # print(ld.get_max_day(2019, 4))
