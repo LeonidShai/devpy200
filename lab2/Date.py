@@ -14,10 +14,6 @@ class Date:
     def __repr__(self):
         return f'Date({self.year}, {self.month!r}, {self.day!r})'
 
-    @property  # лишнее
-    def kolvo_dnei(self):
-        return self.year * 365 + (self.month - 1) * 30 + self.day
-
     @staticmethod
     def is_leap_year(year):
         """
@@ -135,33 +131,6 @@ class Date:
     def date2_date1(date2, date1):  #TODO
         pass
 
-    def __lt__(self, other):
-        if self.year < other.year:
-            return True
-        elif self.year > other.year:
-            return False
-        else:
-            if self.month < other.month:
-                return True
-            elif self.month > other.month:
-                return False
-            else:
-                if self.day < other.day:
-                    return True
-                elif self.day > other.day:
-                    return False
-
-    def __add__(self, other):
-        if not isinstance(other, int):
-            raise ValueError
-        else:
-            self.__day += other
-
-    def __radd__(self, other):
-        if not isinstance(other, int):
-            raise ValueError
-        else:
-            self.__day += other
 
 if __name__ == "__main__":
     data = Date(2019, 9, 19)
@@ -175,13 +144,3 @@ if __name__ == "__main__":
     print(data.add_day(15))
     # ld = Date(2019, 4, 6)
     # print(ld.get_max_day(2019, 4))
-    # d1 = Date(2020, 2, 7)
-    # d2 = Date(2020, 2, 6)
-    # print(d1.kolvo_dnei - d2.kolvo_dnei)
-    # print(d1 > d2)
-    # # __add__
-    # d1 + 5
-    # print(d1)
-    # # __radd__
-    # 5 + d1
-    # print(d1)
