@@ -201,5 +201,5 @@ if __name__ == "__main__":
     print(data.add_month(13))
     print(data.add_day(1365))
     print(data.date2_date1("12.3.2020", "9.4.2021"))
-    # ld = Date(2019, 4, 6)
-    # print(ld.get_max_day(2019, 4))
+    ld = Date(2019, 4, 6)
+    print(ld.get_max_day(2019, 4))
