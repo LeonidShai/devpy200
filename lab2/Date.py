@@ -101,24 +101,52 @@ class Date:
     def year(self):
         return self.__year
 
-    def add_day(self, day):  #TODO
-        day = self.__valid_type_value(day)
-        if self.is_leap_year(self.year):
-            year = self.year + (day // 366)
-            month = self.month + ((366 % day) // 12)
-            dnei = self.get_max_day(year, month)
-            if ((366 % day) % 12) // dnei >= 1:
-                month += 1
-            day = ((day % 366) % 12) % dnei
-            return f"{day}.{month}.{year}"
-        else:
-            year = self.year + (day // 365)
-            month = self.month + ((day % 365) // 12)
-            dnei = self.get_max_day(year, month)
-            if ((day % 366) % 12) // dnei > 0:
-                month += 1
-            day = ((day % 366) % 12) % dnei
-            return f"{day}.{month}.{year}"
+    def add_day(self, day):
+        day = self.__valid_type_value(day)  # провурка верности ввода
+
+        month = self.__month
+        year = self.__year
+        den = self.__day
+
+        # 112 - 117 вычисление года
+        zn = day // (3 * 365 + 366)
+        year += zn * 4
+        zn = day % (3 * 365 + 366)
+        zn = zn // 365
+        year += zn
+
+        day = (day % (3 * 365 + 366)) % 365  # остаток дней после вычисления года
+        gde = 0
+        if self.is_leap_year(year):
+            gde = 1
+
+        # 124 - 134 вычисление месяца
+        zn = 0
+        kolvo = self.DAY_OF_MONTH[gde][0]
+        while kolvo < day:
+            zn += 1
+            kolvo += self.DAY_OF_MONTH[gde][zn]
+
+        day = day - (kolvo - self.DAY_OF_MONTH[gde][zn])
+        month += zn
+        if month > 12:
+            year += 1
+            month -= 12
+
+        gde = 0
+        if self.is_leap_year(year):
+            gde = 1
+
+        # 141 - 144 calculate the day
+        den += day
+        if den > self.DAY_OF_MONTH[gde][month - 1]:
+            den -= self.DAY_OF_MONTH[gde][month - 1]
+            month += 1
+        if month > 12:
+            year += 1
+            month -= 12
+
+        return f"{den}.{month}.{year}"
 
     def add_month(self, month):
         month = self.__valid_type_value(month)
@@ -142,6 +170,6 @@ if __name__ == "__main__":
     print(data.get_max_day(2019, 2))
     print(data.add_year(15))
     print(data.add_month(13))
-    print(data.add_day(15))
+    print(data.add_day(381))
     # ld = Date(2019, 4, 6)
     # print(ld.get_max_day(2019, 4))
