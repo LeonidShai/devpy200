@@ -14,10 +14,6 @@ class Date:
     def __repr__(self):
         return f'Date({self.year}, {self.month!r}, {self.day!r})'
 
-    @property  # лишнее
-    def kolvo_dnei(self):
-        return self.year * 365 + (self.month - 1) * 30 + self.day
-
     @staticmethod
     def is_leap_year(year):
         """
@@ -57,6 +53,11 @@ class Date:
 
     @classmethod
     def __valid_type_value(cls, value):
+        """
+        Проверка вводимого значения, перевод в int
+        :param value: int, str
+        :return: int
+        """
         if not isinstance(value, (int, str)):
             raise TypeError
         if isinstance(value, str):
@@ -68,6 +69,13 @@ class Date:
 
     @classmethod
     def __is_valid_date(cls, year, month, day):
+        """
+        Проверки вводимых значений
+        :param year: int
+        :param month: int
+        :param day: int
+        :return: None
+        """
         if not isinstance(year, int):
             raise TypeError('year must be int')
         if not isinstance(month, int):
@@ -87,6 +95,7 @@ class Date:
 
     @date.setter
     def date(self, value):
+        print("Хочу, чтобы была дата:")
         value = value.split(".")
         self.__day = int(value[0])
         self.__month = int(value[1])
@@ -104,64 +113,114 @@ class Date:
     def year(self):
         return self.__year
 
-    def add_day(self, day):  #TODO
-        day = self.__valid_type_value(day)
-        if self.is_leap_year(self.year):
-            year = self.year + (day // 366)
-            month = self.month + ((366 % day) // 12)
-            dnei = self.get_max_day(year, month)
-            if ((366 % day) % 12) // dnei >= 1:
-                month += 1
-            day = ((day % 366) % 12) % dnei
-            return f"{day}.{month}.{year}"
-        else:
-            year = self.year + (day // 365)
-            month = self.month + ((day % 365) // 12)
-            dnei = self.get_max_day(year, month)
-            if ((day % 366) % 12) // dnei > 0:
-                month += 1
-            day = ((day % 366) % 12) % dnei
-            return f"{day}.{month}.{year}"
+    def add_day(self, day):
+        """
+        Добавляет количество дней к дате
+        :param day: int, str
+        :return: str
+        """
+        day = self.__valid_type_value(day)  # провурка верности ввода
+        d = day
+
+        month = self.__month
+        year = self.__year
+        den = self.__day
+
+        # 112 - 117 вычисление года
+        zn = day // (3 * 365 + 366)
+        year += zn * 4
+        zn = day % (3 * 365 + 366)
+        zn = zn // 365
+        year += zn
+
+        day = (day % (3 * 365 + 366)) % 365  # остаток дней после вычисления года
+        gde = 0
+        if self.is_leap_year(year):
+            gde = 1
+
+        # 124 - 134 вычисление месяца
+        zn = 0
+        kolvo = self.DAY_OF_MONTH[gde][0]
+        while kolvo < day:
+            zn += 1
+            kolvo += self.DAY_OF_MONTH[gde][zn]
+
+        day = day - (kolvo - self.DAY_OF_MONTH[gde][zn])
+        month += zn
+        if month > 12:
+            year += 1
+            month -= 12
+
+        gde = 0
+        if self.is_leap_year(year):
+            gde = 1
+
+        # 141 - 144 calculate the day
+        den += day
+        if den > self.DAY_OF_MONTH[gde][month - 1]:
+            den -= self.DAY_OF_MONTH[gde][month - 1]
+            month += 1
+        if month > 12:
+            year += 1
+            month -= 12
+
+        return f"Через {d} дней будет {den}.{month}.{year}"
 
     def add_month(self, month):
+        """
+        Добавляет месяц к дате
+        :param month: int, str
+        :return: str
+        """
         month = self.__valid_type_value(month)
-        return f"{self.day}.{self.month + (month%12)}.{self.year + (month//12)}"
+        return f"Через {month} месяцев будет {self.day}.{self.month + (month%12)}.{self.year + (month//12)}"
 
     def add_year(self, year):
+        """
+        Добавляет год к дате
+        :param year: int, str
+        :return: str
+        """
         year = self.__valid_type_value(year)
-        return f"{self.day}.{self.month}.{self.year + year}"
+        return f"Через {year} лет будет {self.day}.{self.month}.{self.year + year}"
 
     @staticmethod
-    def date2_date1(date2, date1):  #TODO
-        pass
+    def date2_date1(date1, date2):
+        """
+        Определяет промежуток времени от одной даты до другой в днях, месяцах и годах
+        :param date1: str
+        :param date2: str
+        :return: str
+        """
+        date1 = date1.split(".")
+        date2 = date2.split(".")
+        d1, d2 = int(date1[0]), int(date2[0])
+        m1, m2 = int(date1[1]), int(date2[1])
+        y1, y2 = int(date1[2]), int(date2[2])
+        if y2 < y1:
+            y2, y1 = y1, y2
+            m2, m1 = m1, m2
+            d2, d1 = d1, d2
 
-    def __lt__(self, other):
-        if self.year < other.year:
-            return True
-        elif self.year > other.year:
-            return False
-        else:
-            if self.month < other.month:
-                return True
-            elif self.month > other.month:
-                return False
-            else:
-                if self.day < other.day:
-                    return True
-                elif self.day > other.day:
-                    return False
+        y = y2 - y1
+        m = m2 - m1
+        if m < 0:
+            y -= 1
+            m = 12 + m
 
-    def __add__(self, other):
-        if not isinstance(other, int):
-            raise ValueError
-        else:
-            self.__day += other
+        d = d2 - d1
+        if d < 0:
+            gde = 0
+            if Date.is_leap_year(y):
+                gde = 1
+            m -= 1
+            d = Date.DAY_OF_MONTH[gde][m - 1] + d
+        if m < 0:
+            y -= 1
+            m = 12 + m
 
-    def __radd__(self, other):
-        if not isinstance(other, int):
-            raise ValueError
-        else:
-            self.__day += other
+        return f"От {d2}.{m2}.{y2} до {d1}.{m1}.{y1} {d} дней, {m} месяцев, {y} лет."
+
 
 if __name__ == "__main__":
     data = Date(2019, 9, 19)
@@ -172,16 +231,7 @@ if __name__ == "__main__":
     print(data.get_max_day(2019, 2))
     print(data.add_year(15))
     print(data.add_month(13))
-    print(data.add_day(15))
-    # ld = Date(2019, 4, 6)
-    # print(ld.get_max_day(2019, 4))
-    # d1 = Date(2020, 2, 7)
-    # d2 = Date(2020, 2, 6)
-    # print(d1.kolvo_dnei - d2.kolvo_dnei)
-    # print(d1 > d2)
-    # # __add__
-    # d1 + 5
-    # print(d1)
-    # # __radd__
-    # 5 + d1
-    # print(d1)
+    print(data.add_day(1365))
+    print(data.date2_date1("12.3.2020", "9.4.2021"))
+    ld = Date(2019, 4, 6)
+    print(ld.get_max_day(2019, 4))
