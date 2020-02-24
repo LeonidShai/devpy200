@@ -1,9 +1,10 @@
 # реализация циклического двусвязного списка с использование слабых ссылок
 import weakref
 import drivers
+from react import Observer, Subject
 
-class DLL:
-    class Node:
+class DLL(Observer):
+    class Node(Subject):
         """
         Создание узла
         """
@@ -15,6 +16,7 @@ class DLL:
             :param pred: type(self)
             :param sled: type(self)
             """
+            super().__init__()
             if data is not None and not isinstance(data, (int, str)):
                 raise TypeError
             elif pred is not None and not isinstance(pred, type(self)):
@@ -113,6 +115,9 @@ class DLL:
             current_node.sled = self.tail
             self.head.pred = weakref.ref(self.tail)
         self.__lenght += 1
+        t = self.Node()
+        t.add_observer(self)
+        t.notify()
 
     def remove_node(self, indx):
         """
@@ -163,6 +168,8 @@ class DLL:
             print("Нет такого индекса")
             self.__lenght += 1
         self.__lenght -= 1
+        t = self.Node()
+        t.notify()
 
     def delete_node(self, node):
         """
@@ -220,6 +227,8 @@ class DLL:
                 sled_node = current_node.sled
                 sch += 1
             self.__lenght += 1
+        t = self.Node()
+        t.notify()
 
     def left_add_node(self, node):
         """
@@ -231,6 +240,8 @@ class DLL:
         head.pred = weakref.ref(self.head)
         self.tail.sled = self.head
         self.__lenght += 1
+        t = self.Node()
+        t.notify()
 
     def search_node(self, node):
         """
@@ -271,6 +282,8 @@ class DLL:
             usel = usel().pred
             i += 1
         self.__lenght = 0
+        t = self.Node()
+        t.notify()
 
     def to_dict(self):
         current_node = self.head
@@ -295,6 +308,10 @@ class DLL:
 
     def save(self):
         self.__structure_driver.write(self.to_dict())
+
+    def update(self, node):
+        print("Value changed")
+        self.save()
 
 
 if __name__ == "__main__":
