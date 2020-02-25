@@ -18,4 +18,4 @@ class Subject:
 
     def notify(self):
         for o in self._o:
-            o.update(self)
+            o().update(self)
