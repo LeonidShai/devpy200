@@ -199,16 +199,20 @@ class DLL(Observer):
         :param node: int, str
         :param indx: int
         """
-        if not isinstance(indx, int):
+        if not isinstance(indx, (int, str)):
             raise TypeError
         if not isinstance(node, (int, str)):
             raise TypeError
 
+        indx = int(indx)
         print(f"Вставка элемента {node} с индексом {indx}.")
         print("Индексация начинается с нуля!")
         if indx == 0:
             print("1")
-            self.left_add_node(node)
+            if self.__lenght == 0:
+                self.add_node(node)
+            else:
+                self.left_add_node(node)
         elif indx > self.__lenght-1:
             print("2")
             self.add_node(node)
@@ -238,7 +242,7 @@ class DLL(Observer):
         """
         head = self.head
         self.head = self.Node(node, self.tail, head)
-        self.head.add_observer()
+        self.head.add_observer(self)
         self.head.notify()
         head.pred = weakref.ref(self.head)
         self.tail.sled = self.head

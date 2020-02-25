@@ -13,5 +13,9 @@ print(our_list)
 our_list.delete_node('Hey')
 print(our_list)
 
-
+print("Создадим новый LinkedList из файла")
+l2 = mod_double_link_list.DLL()
+l2.set_structure_driver(builder_file.JSONFileDriver('g.json'))
+l2.load()
+print(l2)
 #our_list.save()
