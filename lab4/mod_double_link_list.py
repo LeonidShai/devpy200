@@ -1,10 +1,24 @@
 # реализация циклического двусвязного списка с использование слабых ссылок
 import weakref
-import drivers
 from react import Observer, Subject
 
+
+class Data(Subject):
+    def __init__(self, value=0):
+        super().__init__()
+        self.__value = value
+
+    def take(self):
+        return self.__value
+
+    def vvod(self, value):
+        self.__value = value
+        self.notify()
+        return self.__value
+
+
 class DLL(Observer):
-    class Node(Subject):
+    class Node(Data):
         """
         Создание узла
         """
@@ -16,7 +30,7 @@ class DLL(Observer):
             :param pred: type(self)
             :param sled: type(self)
             """
-            super().__init__()
+            super().__init__(data)
             if data is not None and not isinstance(data, (int, str)):
                 raise TypeError
             elif pred is not None and not isinstance(pred, type(self)):
@@ -25,7 +39,7 @@ class DLL(Observer):
                 raise TypeError
             else:
                 self.pred = weakref.ref(pred) if pred is not None else None
-                self.data = data
+                self.data = self.vvod(data)
                 self.sled = sled
 
         def __str__(self):
@@ -106,21 +120,19 @@ class DLL(Observer):
         if not self.head:
             self.head = self.Node(node, None, None)
             self.head.add_observer(self)
-            self.head.notify()
         elif not self.tail:
             self.tail = self.Node(node, self.head, self.head)
             self.head.sled = self.tail
             self.head.pred = weakref.ref(self.tail)
             self.tail.add_observer(self)
-            self.tail.notify()
         else:
             current_node = self.tail
             self.tail = self.Node(node, current_node, self.head)
             current_node.sled = self.tail
             self.head.pred = weakref.ref(self.tail)
             self.tail.add_observer(self)
-            self.tail.notify()
         self.__lenght += 1
+        self.update(node)
 
     def remove_node(self, indx):
         """
@@ -138,7 +150,6 @@ class DLL(Observer):
                 self.head = current_node.sled
                 self.head.pred = weakref.ref(self.tail)
                 self.tail.sled = self.head
-                self.head.notify()
             else:
                 self.clear()
 
@@ -148,7 +159,6 @@ class DLL(Observer):
             self.tail = current_node()
             self.tail.sled = self.head
             self.head.pred = weakref.ref(self.tail)
-            self.tail.notify()
 
         elif 1 <= indx <= self.__lenght-1:
             current_node = self.head.sled
@@ -161,7 +171,6 @@ class DLL(Observer):
                     sled_node.pred = weakref.ref(pred_node)
                     current_node.remove_observer(self)
                     current_node = sled_node
-                    current_node.notify()
                 else:
                     current_node = current_node.sled
                     pred_node = pred_node.sled
@@ -171,6 +180,7 @@ class DLL(Observer):
             print("Нет такого индекса")
             self.__lenght += 1
         self.__lenght -= 1
+        self.update(node)
 
     def delete_node(self, node):
         """
@@ -226,7 +236,6 @@ class DLL(Observer):
                     sled_node.pred = None
                     new_node = self.Node(node, current_node, sled_node)
                     new_node.add_observer(self)
-                    new_node.notify()
                     current_node.sled = new_node
                     sled_node.pred = weakref.ref(new_node)
 
@@ -234,6 +243,7 @@ class DLL(Observer):
                 sled_node = current_node.sled
                 sch += 1
             self.__lenght += 1
+            self.update(node)
 
     def left_add_node(self, node):
         """
@@ -243,10 +253,10 @@ class DLL(Observer):
         head = self.head
         self.head = self.Node(node, self.tail, head)
         self.head.add_observer(self)
-        self.head.notify()
         head.pred = weakref.ref(self.head)
         self.tail.sled = self.head
         self.__lenght += 1
+        self.update(node)
 
     def search_node(self, node):
         """
