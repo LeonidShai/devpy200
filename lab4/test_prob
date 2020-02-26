@@ -1,0 +1,93 @@
+from weakref import ref
+
+class Observer:
+    def update(self):
+        pass
+
+
+class Subject:
+    def __init__(self):
+        self._o = set()
+
+    def add_observer(self, o):
+        self._o.add(ref(o))
+
+    def remove_observer(self, o):
+        self._o.remove(ref(o))
+
+    def notify(self):
+        for o in self._o:
+            o().update(self)
+            
+class Data(Subject):
+    def __init__(self, value=0):
+        super().__init__()
+        self.__value = value
+
+    def take(self):
+        return self.__value
+    
+    def vvod(self, value):
+        if value != self.__value:
+            self.__value = value
+            self.notify()
+        return self.__value
+
+class DLL(Observer):
+    class Node(Data):
+      def __init__(self, data=None, pred=None, sled=None):
+        super().__init__()
+        self.pred = ref(pred) if pred is not None else None
+        self.data = self.vvod(data)
+        self.sled = sled
+
+      
+    def __init__(self):
+      self.head = None
+      self.tail = None
+      self.__lenght = 0
+        
+    def __str__(self):
+      if self.__lenght == 0:
+          return f"[]"
+
+      usel = self.head
+      spisok = str()
+      i = 0
+      while i < self.__lenght:
+          spisok += f"{usel.data}, "
+          usel = usel.sled
+          i += 1
+      spisok = "Список:\t\t\t [" + spisok[:-2] + "]"
+      return spisok
+        
+    def add_node(self, node):
+      if not self.head:
+          self.head = self.Node(node, None, None)
+          self.head.add_observer(self)
+          #self.head.notify()
+      elif not self.tail:
+          self.tail = self.Node(node, self.head, self.head)
+          self.head.sled = self.tail
+          self.head.pred = ref(self.tail)
+          self.tail.add_observer(self)
+          #self.tail.notify()
+      else:
+          current_node = self.tail
+          self.tail = self.Node(node, current_node, self.head)
+          current_node.sled = self.tail
+          self.head.pred = ref(self.tail)
+          self.tail.add_observer(self)
+          #self.tail.notify()
+      self.__lenght += 1
+      self.update(node)
+      
+    def update(self, node):
+      print("Value changed")
+        
+if __name__ == "__main__":
+  c = DLL()
+  c.add_node(5)
+  c.add_node(3)
+  c.add_node(8)
+  print(c)
